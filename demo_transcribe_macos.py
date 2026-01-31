@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-🎧 Podcast Transcriber для macOS
-Версия с учетом всех macOS особенностей
+🎧 Podcast Transcriber for macOS
+Version with all macOS-specific fixes
 """
 
 import os
@@ -9,7 +9,7 @@ import sys
 import subprocess
 
 def check_command(command):
-    """Проверяет, доступна ли команда"""
+    """Check if command is available"""
     try:
         subprocess.run([command, '--version'], 
                       capture_output=True, 
@@ -19,10 +19,10 @@ def check_command(command):
         return False
 
 def install_package(package_name):
-    """Устанавливает Python пакет"""
-    print(f"⚠️  Устанавливаю {package_name}...")
+    """Install Python package"""
+    print(f"⚠️  Installing {package_name}...")
     
-    # Пробуем разные варианты pip
+    # Try different pip variants
     pip_commands = ['pip3', 'pip', 'python3 -m pip', 'python -m pip']
     
     for pip_cmd in pip_commands:
@@ -31,127 +31,127 @@ def install_package(package_name):
             result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
             
             if result.returncode == 0:
-                print(f"✅ {package_name} установлен")
+                print(f"✅ {package_name} installed")
                 return True
         except Exception:
             continue
     
-    print(f"❌ Не удалось установить {package_name}")
+    print(f"❌ Failed to install {package_name}")
     return False
 
 print("=" * 70)
 print(" " * 20 + "🎧 PODCAST TRANSCRIBER")
-print(" " * 25 + "для macOS")
+print(" " * 25 + "for macOS")
 print("=" * 70)
 print()
 
-# Проверка Python
-print("🔍 Проверяю систему...")
+# Check Python
+print("🔍 Checking system...")
 if not (check_command('python3') or check_command('python')):
-    print("❌ Python не найден!")
-    print("\n📦 Установите Python:")
+    print("❌ Python not found!")
+    print("\n📦 Install Python:")
     print("   brew install python")
-    print("\nИли скачайте с: https://www.python.org/downloads/")
+    print("\nOr download from: https://www.python.org/downloads/")
     sys.exit(1)
-print("✅ Python найден")
+print("✅ Python found")
 
-# Проверка ffmpeg
+# Check ffmpeg
 if not check_command('ffmpeg'):
-    print("⚠️  ffmpeg не найден (нужен для Whisper)")
-    print("\n📦 Установите ffmpeg:")
+    print("⚠️  ffmpeg not found (required for Whisper)")
+    print("\n📦 Install ffmpeg:")
     print("   brew install ffmpeg")
-    print("\nПосле установки запустите скрипт снова.")
+    print("\nAfter installation, run the script again.")
     
-    response = input("\nПродолжить без ffmpeg? (может не работать) [y/N]: ")
+    response = input("\nContinue without ffmpeg? (may not work) [y/N]: ")
     if response.lower() != 'y':
         sys.exit(1)
 else:
-    print("✅ ffmpeg найден")
+    print("✅ ffmpeg found")
 
 print()
 print("=" * 70)
-print("📦 Проверяю Python библиотеки...")
+print("📦 Checking Python libraries...")
 print("=" * 70)
 print()
 
-# Проверка и установка requests
+# Check and install requests
 try:
     import requests
-    print("✅ requests установлен")
+    print("✅ requests installed")
 except ImportError:
     if not install_package('requests'):
-        print("\n❌ Не удалось установить requests")
-        print("Попробуйте вручную: pip3 install requests --break-system-packages")
+        print("\n❌ Failed to install requests")
+        print("Try manually: pip3 install requests --break-system-packages")
         sys.exit(1)
     import requests
 
-# Проверка и установка whisper
+# Check and install whisper
 try:
     import whisper
-    print("✅ whisper установлен")
+    print("✅ whisper installed")
 except ImportError:
-    print("⚠️  Устанавливаю openai-whisper (это займет время)...")
-    print("    Размер: ~1 GB с зависимостями")
+    print("⚠️  Installing openai-whisper (this will take time)...")
+    print("    Size: ~1 GB with dependencies")
     
-    response = input("\nПродолжить установку? [Y/n]: ")
+    response = input("\nContinue with installation? [Y/n]: ")
     if response.lower() == 'n':
-        print("\n💡 Установите вручную:")
+        print("\n💡 Install manually:")
         print("   pip3 install openai-whisper --break-system-packages")
         sys.exit(0)
     
     if not install_package('openai-whisper'):
-        print("\n❌ Не удалось установить whisper")
-        print("Попробуйте вручную: pip3 install openai-whisper --break-system-packages")
+        print("\n❌ Failed to install whisper")
+        print("Try manually: pip3 install openai-whisper --break-system-packages")
         sys.exit(1)
     import whisper
 
 print()
 print("=" * 70)
-print("✅ Все зависимости установлены!")
+print("✅ All dependencies installed!")
 print("=" * 70)
 print()
 
-# Получаем URL
+# Get URL
 if len(sys.argv) > 1:
     audio_url = sys.argv[1]
-    print(f"📥 Буду транскрибировать: {audio_url[:60]}...")
+    print(f"📥 Will transcribe: {audio_url[:60]}...")
 else:
-    print("💡 КАК ИСПОЛЬЗОВАТЬ:")
+    print("💡 HOW TO USE:")
     print()
     print("python3 demo_transcribe_macos.py 'https://example.com/podcast.mp3'")
     print()
     print("=" * 70)
-    print("📝 ПОШАГОВАЯ ИНСТРУКЦИЯ:")
+    print("📝 STEP-BY-STEP GUIDE:")
     print("=" * 70)
     print()
-    print("1. Найдите подкаст в Apple Podcasts в браузере")
-    print("2. Откройте Developer Tools (Cmd + Option + I)")
-    print("3. Вкладка 'Network'")
-    print("4. Нажмите Play на подкасте")
-    print("5. Найдите файл .mp3 (обычно самый большой)")
-    print("6. Правой кнопкой → Copy → Copy Link Address")
-    print("7. Запустите скрипт с этой ссылкой")
+    print("1. Find podcast in Apple Podcasts in browser")
+    print("2. Open Developer Tools (Cmd + Option + I)")
+    print("3. 'Network' tab")
+    print("4. Press Play on podcast")
+    print("5. Find .mp3 file (usually the largest)")
+    print("6. Right-click → Copy → Copy Link Address")
+    print("7. Run script with this link")
     print()
     print("=" * 70)
     print()
-    print("ИЛИ используйте Otter.ai (проще!):")
+    print("OR use Otter.ai (easier!):")
     print("   → https://otter.ai")
-    print("   → Загрузите MP3")
-    print("   → Получите текст за 3 минуты")
+    print("   → Upload MP3")
+    print("   → Get text in 3 minutes")
     print()
     sys.exit(0)
 
-# Скачиваем аудио
+# Download audio
 print()
 print("=" * 70)
-print("📥 ШАГ 1: Скачивание аудио")
+print("📥 STEP 1: Downloading audio")
 print("=" * 70)
 print()
 
 audio_file = "podcast_temp.mp3"
 
 try:
-    print("⏳ Скачиваю... (это может занять несколько минут)")
+    print("⏳ Downloading... (this may take several minutes)")
     
     response = requests.get(audio_url, stream=True, timeout=120)
     response.raise_for_status()
@@ -173,94 +173,94 @@ try:
     
     print()
     file_size = os.path.getsize(audio_file) / (1024 * 1024)
-    print(f"✅ Скачано: {file_size:.1f} MB")
+    print(f"✅ Downloaded: {file_size:.1f} MB")
     
-    # Оцениваем длительность (примерно)
-    estimated_minutes = file_size / 1.0  # грубая оценка: ~1 MB = ~1 минута
-    print(f"📊 Примерная длительность: ~{estimated_minutes:.0f} минут")
+    # Estimate duration (rough)
+    estimated_minutes = file_size / 1.0  # rough estimate: ~1 MB = ~1 minute
+    print(f"📊 Estimated duration: ~{estimated_minutes:.0f} minutes")
     
 except Exception as e:
-    print(f"\n❌ Ошибка скачивания: {e}")
-    print("\n💡 Проверьте:")
-    print("   • Интернет-соединение")
-    print("   • Правильность URL")
-    print("   • Доступность файла")
+    print(f"\n❌ Download error: {e}")
+    print("\n💡 Check:")
+    print("   • Internet connection")
+    print("   • URL correctness")
+    print("   • File availability")
     sys.exit(1)
 
-# Транскрибируем
+# Transcribe
 print()
 print("=" * 70)
-print("🎙️  ШАГ 2: Транскрипция")
+print("🎙️  STEP 2: Transcription")
 print("=" * 70)
 print()
 
 try:
-    print("⏳ Загружаю модель Whisper 'base'...")
-    print("   (При первом запуске скачается ~140 MB)")
+    print("⏳ Loading Whisper 'base' model...")
+    print("   (First run will download ~140 MB)")
     
     model = whisper.load_model("base")
-    print("✅ Модель загружена")
+    print("✅ Model loaded")
     
     print()
-    print("⏳ Начинаю транскрипцию...")
-    print("   Это займет примерно 20-30 минут для часового подкаста")
-    print("   Можете отойти, попить чай ☕")
+    print("⏳ Starting transcription...")
+    print("   This will take approximately 20-30 minutes for 1-hour podcast")
+    print("   You can step away, grab some coffee ☕")
     print()
     
     result = model.transcribe(audio_file, language="en", verbose=True)
     
     print()
-    print("✅ Транскрипция завершена!")
+    print("✅ Transcription complete!")
     
-    # Сохраняем результат
+    # Save result
     output_file = "transcript.txt"
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(result["text"])
     
     print()
     print("=" * 70)
-    print("📊 СТАТИСТИКА:")
+    print("📊 STATISTICS:")
     print("=" * 70)
-    print(f"📄 Файл: {output_file}")
-    print(f"📏 Символов: {len(result['text']):,}")
-    print(f"📝 Слов: {len(result['text'].split()):,}")
-    print(f"📍 Расположение: {os.path.abspath(output_file)}")
+    print(f"📄 File: {output_file}")
+    print(f"📏 Characters: {len(result['text']):,}")
+    print(f"📝 Words: {len(result['text'].split()):,}")
+    print(f"📍 Location: {os.path.abspath(output_file)}")
     
-    # Показываем превью
+    # Show preview
     print()
     print("=" * 70)
-    print("📝 ПРЕВЬЮ (первые 500 символов):")
+    print("📝 PREVIEW (first 500 characters):")
     print("=" * 70)
     print()
     print(result["text"][:500])
     if len(result["text"]) > 500:
         print("...")
     
-    # Удаляем временный файл
+    # Remove temporary file
     print()
     if os.path.exists(audio_file):
         os.remove(audio_file)
-        print("🗑️  Временный аудиофайл удален")
+        print("🗑️  Temporary audio file deleted")
     
     print()
     print("=" * 70)
-    print("✨ ГОТОВО! Транскрипция сохранена!")
+    print("✨ DONE! Transcript saved!")
     print("=" * 70)
     print()
-    print(f"Откройте файл: open {output_file}")
+    print(f"Open file: open {output_file}")
     print()
 
 except KeyboardInterrupt:
-    print("\n\n⚠️  Прервано пользователем")
+    print("\n\n⚠️  Interrupted by user")
     if os.path.exists(audio_file):
         os.remove(audio_file)
     sys.exit(0)
 
 except Exception as e:
-    print(f"\n❌ Ошибка транскрипции: {e}")
-    print("\n💡 Возможные решения:")
-    print("   • Убедитесь, что ffmpeg установлен: brew install ffmpeg")
-    print("   • Попробуйте переустановить whisper:")
+    print(f"\n❌ Transcription error: {e}")
+    print("\n💡 Possible solutions:")
+    print("   • Make sure ffmpeg is installed: brew install ffmpeg")
+    print("   • Try reinstalling whisper:")
     print("     pip3 uninstall openai-whisper")
     print("     pip3 install openai-whisper --break-system-packages")
     
