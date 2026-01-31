@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-🎙️ Транскрибация локальных аудио файлов
-С таймкодами и красивым форматированием!
+🎙️ Local Audio File Transcription
+Creates transcripts with timestamps and beautiful formatting
 """
 
 import whisper
@@ -10,80 +10,80 @@ import os
 
 print("=" * 70)
 print(" " * 15 + "🎙️ LOCAL FILE TRANSCRIBER v2.0")
-print(" " * 18 + "(с таймкодами и абзацами)")
+print(" " * 18 + "(with timestamps and paragraphs)")
 print("=" * 70)
 print()
 
-# Получаем имя файла
+# Get filename from arguments
 if len(sys.argv) < 2:
-    print("💡 КАК ИСПОЛЬЗОВАТЬ:")
+    print("💡 HOW TO USE:")
     print()
-    print("python3 transcribe_local_v2.py 'имя_файла.mp3'")
+    print("python3 transcribe_local_v2.py 'filename.mp3'")
     print()
-    print("ИЛИ просто перетащите файл в Terminal после команды:")
-    print("python3 transcribe_local_v2.py [перетащите файл сюда]")
+    print("OR simply drag the file into Terminal after the command:")
+    print("python3 transcribe_local_v2.py [drag file here]")
     print()
     sys.exit(0)
 
 audio_file = sys.argv[1]
 
-# Проверяем существование файла
+# Check if file exists
 if not os.path.exists(audio_file):
-    print(f"❌ Файл не найден: {audio_file}")
+    print(f"❌ File not found: {audio_file}")
     print()
-    print("💡 Убедитесь что:")
-    print("   • Файл находится в текущей папке")
-    print("   • ИЛИ указан полный путь")
-    print("   • Название написано правильно")
+    print("💡 Make sure that:")
+    print("   • File is in the current folder")
+    print("   • OR full path is specified")
+    print("   • Filename is spelled correctly")
     print()
     sys.exit(1)
 
-# Показываем информацию о файле
+# Display file information
 file_size = os.path.getsize(audio_file) / (1024 * 1024)
-print(f"📁 Файл: {audio_file}")
-print(f"💾 Размер: {file_size:.1f} MB")
-print(f"📊 Примерная длительность: ~{file_size:.0f} минут")
+print(f"📁 File: {audio_file}")
+print(f"💾 Size: {file_size:.1f} MB")
+print(f"📊 Estimated duration: ~{file_size:.0f} minutes")
 print()
 
-# Загружаем модель
+# Load Whisper model
 print("=" * 70)
-print("🎙️  ТРАНСКРИПЦИЯ")
+print("🎙️  TRANSCRIPTION")
 print("=" * 70)
 print()
-print("⏳ Загружаю модель Whisper 'base'...")
+print("⏳ Loading Whisper 'base' model...")
 
 try:
     model = whisper.load_model("base")
-    print("✅ Модель загружена")
+    print("✅ Model loaded")
 except Exception as e:
-    print(f"❌ Ошибка загрузки модели: {e}")
+    print(f"❌ Model loading error: {e}")
     print()
-    print("💡 Попробуйте установить заново:")
+    print("💡 Try reinstalling:")
     print("   pip3 install openai-whisper --break-system-packages")
     sys.exit(1)
 
-# Транскрибируем
+# Start transcription
 print()
-print("🔄 Начинаю транскрипцию...")
-print("   (это займет примерно 20-30 минут для часового аудио)")
+print("🔄 Starting transcription...")
+print("   (this will take approximately 20-30 minutes for 1-hour audio)")
 print()
 
 try:
     result = model.transcribe(audio_file, language="en", verbose=True)
     
-    # Создаем ТРИ файла
+    # Create THREE files
     output_clean = "transcript_clean.txt"
     output_paragraphs = "transcript_paragraphs.txt"
     output_timestamps = "transcript_timestamps.txt"
     
-    # 1. Чистый текст (сплошной)
+    # 1. Clean text (continuous)
     with open(output_clean, "w", encoding="utf-8") as f:
         f.write(result["text"])
     
-    # 2. С абзацами (каждый сегмент = абзац)
+    # 2. With paragraphs (each segment = paragraph)
     with open(output_paragraphs, "w", encoding="utf-8") as f:
         f.write("=" * 70 + "\n")
-        f.write("ТРАНСКРИПЦИЯ С АБЗАЦАМИ\n")
+        f.write("TRANSCRIPT WITH PARAGRAPHS\n")
         f.write("=" * 70 + "\n\n")
         
         for segment in result["segments"]:
@@ -92,10 +92,10 @@ try:
                 f.write(text)
                 f.write("\n\n")
     
-    # 3. С таймкодами
+    # 3. With timestamps
     with open(output_timestamps, "w", encoding="utf-8") as f:
         f.write("=" * 70 + "\n")
-        f.write("ТРАНСКРИПЦИЯ С ТАЙМКОДАМИ\n")
+        f.write("TRANSCRIPT WITH TIMESTAMPS\n")
         f.write("=" * 70 + "\n\n")
         
         for segment in result["segments"]:
@@ -103,7 +103,7 @@ try:
             end = segment["end"]
             text = segment["text"].strip()
             
-            # Форматируем время в минуты:секунды
+            # Format time as minutes:seconds
             start_min = int(start // 60)
             start_sec = int(start % 60)
             end_min = int(end // 60)
@@ -112,31 +112,31 @@ try:
             if text:
                 f.write(f"[{start_min:02d}:{start_sec:02d} - {end_min:02d}:{end_sec:02d}] {text}\n\n")
     
-    # Статистика
+    # Statistics
     print()
     print("=" * 70)
-    print("✅ ГОТОВО!")
+    print("✅ DONE!")
     print("=" * 70)
     print()
-    print(f"📄 Создано 3 файла:")
+    print(f"📄 Created 3 files:")
     print(f"   1. {output_clean}")
-    print(f"      → Чистый текст (сплошной)")
+    print(f"      → Clean text (continuous)")
     print()
     print(f"   2. {output_paragraphs} ⭐")
-    print(f"      → С абзацами (удобно читать)")
+    print(f"      → With paragraphs (easy to read)")
     print()
     print(f"   3. {output_timestamps}")
-    print(f"      → С таймкодами (удобно навигировать)")
+    print(f"      → With timestamps (easy to navigate)")
     print()
-    print(f"📍 Расположение: {os.path.abspath('.')}")
-    print(f"📊 Символов: {len(result['text']):,}")
-    print(f"📝 Слов: {len(result['text'].split()):,}")
-    print(f"⏱️  Сегментов: {len(result['segments'])}")
+    print(f"📍 Location: {os.path.abspath('.')}")
+    print(f"📊 Characters: {len(result['text']):,}")
+    print(f"📝 Words: {len(result['text'].split()):,}")
+    print(f"⏱️  Segments: {len(result['segments'])}")
     print()
     
-    # Превью из версии с абзацами
+    # Preview from paragraph version
     print("=" * 70)
-    print("📝 ПРЕВЬЮ (первые 3 абзаца):")
+    print("📝 PREVIEW (first 3 paragraphs):")
     print("=" * 70)
     print()
     
@@ -153,22 +153,22 @@ try:
     print()
     
     print("=" * 70)
-    print("✨ Транскрипция завершена!")
+    print("✨ Transcription complete!")
     print("=" * 70)
     print()
-    print(f"📖 Откройте для чтения:    open {output_paragraphs}")
-    print(f"🕐 С таймкодами:            open {output_timestamps}")
+    print(f"📖 Open for reading:    open {output_paragraphs}")
+    print(f"🕐 With timestamps:      open {output_timestamps}")
     print()
     
 except KeyboardInterrupt:
-    print("\n\n⚠️  Прервано пользователем")
+    print("\n\n⚠️  Interrupted by user")
     sys.exit(0)
     
 except Exception as e:
-    print(f"\n❌ Ошибка транскрипции: {e}")
+    print(f"\n❌ Transcription error: {e}")
     print()
-    print("💡 Возможные решения:")
-    print("   • Проверьте, что файл не поврежден")
-    print("   • Убедитесь, что ffmpeg установлен: brew install ffmpeg")
-    print("   • Попробуйте другой аудио файл")
+    print("💡 Possible solutions:")
+    print("   • Check that the file is not corrupted")
+    print("   • Make sure ffmpeg is installed: brew install ffmpeg")
+    print("   • Try a different audio file")
     sys.exit(1)
